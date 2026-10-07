@@ -106,27 +106,56 @@ export default function App() {
       const features: ShelterFeature[] = data.features ?? [];
       setNearestShelters(features);
 
-      // Straight dashed line from the clicked point to the #1 nearest shelter
       const lineSource = mapRef.current?.getSource("nearest-line") as
         | maplibregl.GeoJSONSource
         | undefined;
-      lineSource?.setData(
-        features.length > 0
-          ? {
-              type: "FeatureCollection",
-              features: [
-                {
-                  type: "Feature",
-                  geometry: {
-                    type: "LineString",
-                    coordinates: [coords, features[0].geometry.coordinates],
+
+      if (features.length > 0) {
+        const dest = features[0].geometry.coordinates as [number, number];
+        try {
+          // Fetch real walking route using OSRM public API
+          const osrmUrl = `https://router.project-osrm.org/route/v1/foot/${coords[0]},${coords[1]};${dest[0]},${dest[1]}?overview=full&geometries=geojson`;
+          const osrmRes = await fetch(osrmUrl);
+          if (osrmRes.ok) {
+            const osrmData = await osrmRes.json();
+            if (osrmData.code === "Ok" && osrmData.routes?.length > 0) {
+              lineSource?.setData({
+                type: "FeatureCollection",
+                features: [
+                  {
+                    type: "Feature",
+                    geometry: osrmData.routes[0].geometry,
+                    properties: {
+                      distance: osrmData.routes[0].distance,
+                      duration: osrmData.routes[0].duration,
+                    },
                   },
-                  properties: {},
-                },
-              ],
+                ],
+              });
+              return;
             }
-          : EMPTY_FC
-      );
+          }
+        } catch (e) {
+          console.error("OSRM routing failed, falling back to straight line:", e);
+        }
+
+        // Fallback to straight line
+        lineSource?.setData({
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: [coords, dest],
+              },
+              properties: {},
+            },
+          ],
+        });
+      } else {
+        lineSource?.setData(EMPTY_FC);
+      }
     } catch (err) {
       console.error("nearest fetch failed:", err);
     } finally {
@@ -218,7 +247,7 @@ export default function App() {
         type: "line",
         source: "nearest-line",
         layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#f43f5e", "line-width": 4, "line-dasharray": [2, 2] },
+        paint: { "line-color": "#3b82f6", "line-width": 5 }, // Solid blue route line
       });
 
       // Click a cluster -> zoom in until it splits
