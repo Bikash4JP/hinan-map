@@ -1,0 +1,28 @@
+{
+  "name": "hinan-map",
+  "version": "1.0.0",
+  "description": "Multilingual evacuation-site finder (WebGIS) for foreign residents in Japan",
+  "main": "index.js",
+  "scripts": {
+    "dev:api": "tsx watch src/index.ts",
+    "dev:web": "npm --prefix web run dev",
+    "db:import": "tsx scripts/import-shelters.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit && npm --prefix web run build"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^16.4.7",
+    "hono": "^4.6.14",
+    "pg": "^8.13.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/pg": "^8.11.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
