@@ -104,7 +104,7 @@ graph TD
 
 ### 1. Clone & Start PostGIS Container
 ```bash
-git clone https://github.com/your-username/hinan-map.git
+git clone https://github.com/Bikash4JP/hinan-map.git
 cd hinan-map
 docker compose up -d db
 ```
