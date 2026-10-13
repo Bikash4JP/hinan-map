@@ -9,9 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "hinan-map": "file:..",
     "lucide-react": "^0.468.0",
-    "maplibre-gl": "^4.7.1",
+    "maplibre-gl": "^6.14.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

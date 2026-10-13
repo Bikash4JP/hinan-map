@@ -1,4 +1,7 @@
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
+// MapLibre 6 looks for its worker next to its own module at runtime, which a bundled build
+// does not have. Vite emits the worker as an asset here and we hand MapLibre its URL.
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Locate, Navigation, ShieldAlert, X } from "lucide-react";
 import {
@@ -27,6 +30,8 @@ interface ShelterFeature {
 
 // 練馬区役所 (Nerima City Office). Order is [lng, lat], the GeoJSON / MapLibre standard.
 const NERIMA_CENTER: [number, number] = [139.6517, 35.7356];
+
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
 const EMPTY_FC: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
 

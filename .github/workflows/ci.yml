@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+# The workflow only reads the repository; it never needs write access.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest

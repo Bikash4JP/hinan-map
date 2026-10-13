@@ -89,7 +89,7 @@ In development, Vite serves the front end on port 5173 and proxies `/api` to the
 |---|---|
 | Database | PostgreSQL 16 + PostGIS 3.4 (`postgis/postgis:16-3.4` image) |
 | API | Node.js 22, TypeScript, Hono, Zod, `pg` (raw SQL, no ORM) |
-| Front end | React 18, Vite 6, TypeScript, MapLibre GL JS 4 |
+| Front end | React 18, Vite 6, TypeScript, MapLibre GL JS 6 |
 | Base map | GSI raster tiles, 淡色地図 (`cyberjapandata.gsi.go.jp/xyz/pale`) |
 | Routing | OSRM foot profile hosted by FOSSGIS (`routing.openstreetmap.de`) |
 | Tests / CI | Vitest, GitHub Actions with a PostGIS service container |
@@ -104,7 +104,7 @@ In development, Vite serves the front end on port 5173 and proxies `/api` to the
 | Tool | Version | Check |
 |---|---|---|
 | Git | any recent | `git --version` |
-| Node.js | 22 (the version used in CI and Docker) | `node --version` |
+| Node.js | 22.12 or newer (22 is used in CI and Docker) | `node --version` |
 | Docker | Docker Desktop or Docker Engine with Compose v2 | `docker compose version` |
 
 The default ports are **54320** (PostgreSQL), **3000** (API) and **5173** (front end). They must be free.

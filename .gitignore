@@ -18,3 +18,13 @@ build/
 Thumbs.db
 .vscode/
 .idea/
+
+# Any other env file (keep the example)
+.env.*
+!.env.example
+
+# Local AI-agent tooling and personal setup notes
+.claude/
+skills-lock.json
+memo.md
+.neon
