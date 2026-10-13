@@ -1,4 +1,6 @@
 import { parse } from "csv-parse";
+import { Readable } from "node:stream";
+import type { ReadableStream as WebReadableStream } from "node:stream/web";
 import dotenv from "dotenv";
 import { Client } from "pg";
 
@@ -50,26 +52,16 @@ async function runImport() {
     throw new Error(`Failed to download GSI CSV: ${response.statusText}`);
   }
 
-  // Convert web stream to Node readable stream
-  const reader = response.body.getReader();
-  const nodeStream = new ReadableStream({
-    async start(controller) {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        controller.enqueue(value);
-      }
-      controller.close();
-    },
-  });
-
-  // Convert Web ReadableStream to Node stream for csv-parse
-  const parser = parse({
-    bom: true, // Handle UTF-8 with BOM automatically
-    columns: true,
-    skip_empty_lines: true,
-    trim: true,
-  });
+  // Pipe the download straight into the CSV parser: rows are parsed as they arrive,
+  // and backpressure keeps memory flat however large the file is.
+  const parser = Readable.fromWeb(response.body as WebReadableStream).pipe(
+    parse({
+      bom: true, // Handle UTF-8 with BOM automatically
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+    })
+  );
 
   let totalProcessed = 0;
   let totalInserted = 0;
@@ -122,21 +114,6 @@ async function runImport() {
 
     totalInserted += rows.length;
   };
-
-  // Process stream
-  const nodeReadable = (async function* () {
-    const r = nodeStream.getReader();
-    while (true) {
-      const { done, value } = await r.read();
-      if (done) break;
-      yield value;
-    }
-  })();
-
-  for await (const chunk of nodeReadable) {
-    parser.write(chunk);
-  }
-  parser.end();
 
   console.log("Parsing CSV and importing into PostGIS...");
 

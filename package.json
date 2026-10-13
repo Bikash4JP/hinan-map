@@ -7,6 +7,7 @@
     "dev:api": "tsx watch src/index.ts",
     "dev:web": "npm --prefix web run dev",
     "db:import": "tsx scripts/import-shelters.ts",
+    "build:lambda": "esbuild src/lambda.ts --bundle --platform=node --target=node22 --external:pg-native --outfile=dist/lambda/index.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit && npm --prefix web run build"
   },

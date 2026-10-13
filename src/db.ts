@@ -11,5 +11,6 @@ export const pool = new Pool({
   database: process.env.POSTGRES_DB || "hinan_map",
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  // A serverless Postgres that scales to zero needs a few seconds to wake up on the first query.
+  connectionTimeoutMillis: 10000,
 });

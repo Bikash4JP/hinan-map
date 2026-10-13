@@ -113,8 +113,9 @@ export default function App() {
       if (features.length > 0) {
         const dest = features[0].geometry.coordinates as [number, number];
         try {
-          // Fetch real walking route using OSRM public API
-          const osrmUrl = `https://router.project-osrm.org/route/v1/foot/${coords[0]},${coords[1]};${dest[0]},${dest[1]}?overview=full&geometries=geojson`;
+          // Walking route from the FOSSGIS OSRM server. router.project-osrm.org only serves the
+          // car profile (it ignores "foot" in the URL), which is wrong for people evacuating on foot.
+          const osrmUrl = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${coords[0]},${coords[1]};${dest[0]},${dest[1]}?overview=full&geometries=geojson`;
           const osrmRes = await fetch(osrmUrl);
           if (osrmRes.ok) {
             const osrmData = await osrmRes.json();
@@ -241,7 +242,13 @@ export default function App() {
         },
       });
 
-      map.addSource("nearest-line", { type: "geojson", data: EMPTY_FC });
+      map.addSource("nearest-line", {
+        type: "geojson",
+        data: EMPTY_FC,
+        // The route is computed from OpenStreetMap data (ODbL), which requires this credit
+        attribution:
+          '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+      });
       map.addLayer({
         id: "nearest-line-layer",
         type: "line",

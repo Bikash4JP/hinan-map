@@ -32,10 +32,9 @@ app.get("/api/health", async (c) => {
       dbTime: dbRes.rows[0].now,
     });
   } catch (err: any) {
-    return c.json(
-      { status: "error", message: "Database connection failed", error: err.message },
-      500
-    );
+    // Log the cause server-side only: driver errors can contain connection details.
+    console.error("Health check failed:", err);
+    return c.json({ status: "error", message: "Database connection failed" }, 500);
   }
 });
 
@@ -119,7 +118,7 @@ app.get("/api/shelters", async (c) => {
     });
   } catch (err: any) {
     console.error("Error executing bbox shelters query:", err);
-    return c.json({ error: "Failed to fetch shelters", details: err.message }, 500);
+    return c.json({ error: "Failed to fetch shelters" }, 500);
   }
 });
 
@@ -192,13 +191,14 @@ app.get("/api/shelters/nearest", async (c) => {
     });
   } catch (err: any) {
     console.error("Error executing nearest shelters query:", err);
-    return c.json({ error: "Failed to fetch nearest shelters", details: err.message }, 500);
+    return c.json({ error: "Failed to fetch nearest shelters" }, 500);
   }
 });
 
 const port = parseInt(process.env.PORT || "3000", 10);
 
-if (process.env.NODE_ENV !== "test") {
+// On Lambda the handler in lambda.ts serves requests, so no port is opened there.
+if (process.env.NODE_ENV !== "test" && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
   const server = serve({ fetch: app.fetch, port }, (info) => {
     console.log(`Hono API listening on http://localhost:${info.port}`);
   });
